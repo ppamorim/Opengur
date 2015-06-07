@@ -50,6 +50,7 @@ public class UploadedPhotosFragment extends BaseFragment implements AdapterView.
 
     private int mPreviousItem = 0;
 
+    // TODO This fragment is broken
     public static Fragment createInstance() {
         return new UploadedPhotosFragment();
     }

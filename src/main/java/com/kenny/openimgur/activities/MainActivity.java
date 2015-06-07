@@ -333,12 +333,6 @@ public class MainActivity extends BaseActivity implements FragmentListener, Navi
 
     @Override
     public void onUpdateActionBar(boolean shouldShow) {
-        setActionBarVisibility(mToolBar, shouldShow);
-        if (shouldShow) {
-            mUploadMenu.showMenuButton(true);
-        } else {
-            mUploadMenu.hideMenuButton(true);
-        }
     }
 
     @Override

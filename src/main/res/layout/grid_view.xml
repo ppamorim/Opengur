@@ -4,16 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.kenny.openimgur.ui.HeaderGridView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:stretchMode="columnWidth"
-        android:horizontalSpacing="@dimen/grid_padding"
-        android:verticalSpacing="@dimen/grid_padding"
-        android:numColumns="@integer/gallery_num_columns"
         android:drawSelectorOnTop="true"
-        android:scrollingCache="false"
-        android:animationCache="false" />
+        android:animationCache="false"/>
 
 </android.support.v4.widget.SwipeRefreshLayout>

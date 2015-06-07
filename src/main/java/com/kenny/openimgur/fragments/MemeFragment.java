@@ -101,8 +101,7 @@ public class MemeFragment extends BaseGridFragment {
 
             if (memes != null && !memes.isEmpty()) {
                 LogUtil.v(TAG, "Memes found in database");
-                setUpGridTop();
-                setAdapter(new GalleryAdapter(getActivity(), SetUniqueList.decorate(memes)));
+                setAdapter(new GalleryAdapter(getActivity(), mGrid, SetUniqueList.decorate(memes), this));
                 mMultiStateView.setViewState(MultiStateView.ViewState.CONTENT);
                 mHasMore = false;
             }
@@ -120,8 +119,7 @@ public class MemeFragment extends BaseGridFragment {
                     List<ImgurBaseObject> gallery = (List<ImgurBaseObject>) msg.obj;
 
                     if (getAdapter() == null) {
-                        setUpGridTop();
-                        setAdapter(new GalleryAdapter(getActivity(), SetUniqueList.decorate(gallery)));
+                        setAdapter(new GalleryAdapter(getActivity(), mGrid, SetUniqueList.decorate(gallery), MemeFragment.this));
                     } else {
                         getAdapter().addItems(gallery);
                     }
@@ -141,7 +139,7 @@ public class MemeFragment extends BaseGridFragment {
                         mMultiStateView.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (mGrid != null) mGrid.setSelection(0);
+                                if (mGrid != null) mGrid.scrollToPosition(0);
                             }
                         });
                     }

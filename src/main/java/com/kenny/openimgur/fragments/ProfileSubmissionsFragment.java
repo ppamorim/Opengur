@@ -81,8 +81,7 @@ public class ProfileSubmissionsFragment extends BaseGridFragment {
                     GalleryAdapter adapter = getAdapter();
 
                     if (adapter == null) {
-                        setUpGridTop();
-                        setAdapter(new GalleryAdapter(getActivity(), SetUniqueList.decorate(items)));
+                        setAdapter(new GalleryAdapter(getActivity(), mGrid, SetUniqueList.decorate(items), ProfileSubmissionsFragment.this));
                     } else {
                         adapter.addItems(items);
                     }
@@ -128,19 +127,5 @@ public class ProfileSubmissionsFragment extends BaseGridFragment {
 
         if (mSelectedUser == null)
             throw new IllegalArgumentException("Profile must be supplied to fragment");
-    }
-
-    @Override
-    protected int getAdditionalHeaderSpace() {
-        return getResources().getDimensionPixelSize(R.dimen.tab_bar_height);
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        if (isVisibleToUser && mGrid != null && mGrid.getFirstVisiblePosition() <= 1 && mListener != null) {
-            mListener.onUpdateActionBar(true);
-        }
     }
 }

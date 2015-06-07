@@ -2,6 +2,8 @@ package com.kenny.openimgur.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -25,9 +27,9 @@ import java.util.List;
 import butterknife.InjectView;
 
 /**
- * Created by kcampagna on 7/27/14.
+ * Created by Kenny-PC on 6/7/2015.
  */
-public class GalleryAdapter extends ImgurBaseAdapter<ImgurBaseObject> {
+public class GalleryAdapter extends BaseRecyclerAdapter<ImgurBaseObject> {
     public static final int MAX_ITEMS = 200;
 
     private int mUpvoteColor;
@@ -36,16 +38,16 @@ public class GalleryAdapter extends ImgurBaseAdapter<ImgurBaseObject> {
 
     private boolean mAllowNSFWThumb;
 
-    public GalleryAdapter(Context context, SetUniqueList<ImgurBaseObject> objects) {
+    private View.OnClickListener mClickListener;
+
+    public GalleryAdapter(Context context, RecyclerView view, SetUniqueList<ImgurBaseObject> objects, View.OnClickListener listener) {
         super(context, objects, true);
+        int gridSize = context.getResources().getInteger(R.integer.gallery_num_columns);
+        view.setLayoutManager(new GridLayoutManager(context, gridSize));
         mUpvoteColor = context.getResources().getColor(R.color.notoriety_positive);
         mDownVoteColor = context.getResources().getColor(R.color.notoriety_negative);
         mAllowNSFWThumb = OpengurApp.getInstance(context).getPreferences().getBoolean(SettingsActivity.KEY_NSFW_THUMBNAILS, false);
-    }
-
-    @Override
-    protected DisplayImageOptions getDisplayOptions() {
-        return ImageUtil.getDisplayOptionsForGallery().build();
+        mClickListener = listener;
     }
 
     /**
@@ -57,7 +59,7 @@ public class GalleryAdapter extends ImgurBaseAdapter<ImgurBaseObject> {
      */
     public ArrayList<ImgurBaseObject> getItems(int position) {
         List<ImgurBaseObject> objects;
-        int size = getCount();
+        int size = getItemCount();
 
         if (position - MAX_ITEMS / 2 < 0) {
             objects = getAllItems().subList(0, size > MAX_ITEMS ? position + (MAX_ITEMS / 2) : size);
@@ -68,47 +70,21 @@ public class GalleryAdapter extends ImgurBaseAdapter<ImgurBaseObject> {
         return new ArrayList<>(objects);
     }
 
-    /**
-     * Removes an item from the adapter given an id
-     *
-     * @param id The id of the item
-     * @return If the item was removed
-     */
-    public boolean removeItem(String id) {
-        List<ImgurBaseObject> items = getAllItems();
-        boolean removed = false;
-
-        for (ImgurBaseObject obj : items) {
-            if (obj.getId().equals(id)) {
-                removeItem(obj);
-                removed = true;
-                break;
-            }
-        }
-
-        return removed;
-    }
-
-    public void setAllowNSFW(boolean allowNSFW) {
-        mAllowNSFWThumb = allowNSFW;
-        notifyDataSetChanged();
+    @Override
+    public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.gallery_item, parent, false);
+        view.setOnClickListener(mClickListener);
+        return new GalleryHolder(view);
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        GalleryHolder holder;
+    public void onBindViewHolder(BaseViewHolder holder, int position) {
+        GalleryHolder galleryHolder = (GalleryHolder) holder;
         ImgurBaseObject obj = getItem(position);
-
-        if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.gallery_item, parent, false);
-            holder = new GalleryHolder(convertView);
-        } else {
-            holder = (GalleryHolder) convertView.getTag();
-        }
 
         // Get the appropriate photo to display
         if (obj.isNSFW() && !mAllowNSFWThumb) {
-            holder.image.setImageResource(R.drawable.ic_nsfw);
+            galleryHolder.image.setImageResource(R.drawable.ic_nsfw);
         } else if (obj instanceof ImgurPhoto) {
             ImgurPhoto photoObject = ((ImgurPhoto) obj);
             String photoUrl;
@@ -120,34 +96,42 @@ public class GalleryAdapter extends ImgurBaseAdapter<ImgurBaseObject> {
                 photoUrl = ((ImgurPhoto) obj).getThumbnail(ImgurPhoto.THUMBNAIL_GALLERY, false, null);
             }
 
-            displayImage(holder.image, photoUrl);
+            displayImage(galleryHolder.image, photoUrl);
 
         } else if (obj instanceof ImgurAlbum) {
-            displayImage(holder.image, ((ImgurAlbum) obj).getCoverUrl(ImgurPhoto.THUMBNAIL_GALLERY));
+            displayImage(galleryHolder.image, ((ImgurAlbum) obj).getCoverUrl(ImgurPhoto.THUMBNAIL_GALLERY));
         } else {
             String url = ImgurBaseObject.getThumbnail(obj.getId(), obj.getLink(), ImgurPhoto.THUMBNAIL_GALLERY);
-            displayImage(holder.image, url);
+            displayImage(galleryHolder.image, url);
         }
 
         if (obj.getUpVotes() != Integer.MIN_VALUE) {
-            holder.score.setText((obj.getUpVotes() - obj.getDownVotes()) + " " + holder.score.getContext().getString(R.string.points));
-            holder.score.setVisibility(View.VISIBLE);
+            galleryHolder.score.setText((obj.getUpVotes() - obj.getDownVotes()) + " " + galleryHolder.score.getContext().getString(R.string.points));
+            galleryHolder.score.setVisibility(View.VISIBLE);
         } else {
-            holder.score.setVisibility(View.GONE);
+            galleryHolder.score.setVisibility(View.GONE);
         }
 
         if (obj.isFavorited() || ImgurBaseObject.VOTE_UP.equals(obj.getVote())) {
-            holder.score.setTextColor(mUpvoteColor);
+            galleryHolder.score.setTextColor(mUpvoteColor);
         } else if (ImgurBaseObject.VOTE_DOWN.equals(obj.getVote())) {
-            holder.score.setTextColor(mDownVoteColor);
+            galleryHolder.score.setTextColor(mDownVoteColor);
         } else {
-            holder.score.setTextColor(Color.WHITE);
+            galleryHolder.score.setTextColor(Color.WHITE);
         }
-
-        return convertView;
     }
 
-    static class GalleryHolder extends ImgurViewHolder {
+    @Override
+    protected DisplayImageOptions getDisplayOptions() {
+        return ImageUtil.getDisplayOptionsForGallery().build();
+    }
+
+    public void setAllowNSFW(boolean allowNSFW) {
+        mAllowNSFWThumb = allowNSFW;
+        notifyDataSetChanged();
+    }
+
+    public static class GalleryHolder extends BaseViewHolder {
         @InjectView(R.id.image)
         ImageView image;
 

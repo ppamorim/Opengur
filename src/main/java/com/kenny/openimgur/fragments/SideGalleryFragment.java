@@ -30,6 +30,7 @@ public class SideGalleryFragment extends BaseFragment implements AdapterView.OnI
     private GalleryAdapter mAdapter;
     private SideGalleryListener mListener;
 
+    // TODO This fragment is broken
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -75,8 +76,8 @@ public class SideGalleryFragment extends BaseFragment implements AdapterView.OnI
 
     public void addGalleryItems(ArrayList<ImgurBaseObject> galleryItems) {
         if (isAdded()) {
-            mAdapter = new GalleryAdapter(getActivity(), SetUniqueList.decorate(galleryItems));
-            mListView.setAdapter(mAdapter);
+           // mAdapter = new GalleryAdapter(getActivity(),m SetUniqueList.decorate(galleryItems));
+           // mListView.setAdapter(mAdapter);
         }
     }
 

@@ -173,8 +173,7 @@ public class TopicsFragment extends BaseGridFragment implements TopicsFilterFrag
                     List<ImgurBaseObject> gallery = (List<ImgurBaseObject>) msg.obj;
 
                     if (getAdapter() == null) {
-                        setUpGridTop();
-                        setAdapter(new GalleryAdapter(getActivity(), SetUniqueList.decorate(gallery)));
+                        setAdapter(new GalleryAdapter(getActivity(), mGrid, SetUniqueList.decorate(gallery), TopicsFragment.this));
                     } else {
                         getAdapter().addItems(gallery);
                     }
@@ -189,7 +188,7 @@ public class TopicsFragment extends BaseGridFragment implements TopicsFilterFrag
                         mMultiStateView.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (mGrid != null) mGrid.setSelection(0);
+                                if (mGrid != null) mGrid.scrollToPosition(0);
                             }
                         });
                     }

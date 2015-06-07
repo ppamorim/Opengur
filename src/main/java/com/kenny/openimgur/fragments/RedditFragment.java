@@ -226,8 +226,7 @@ public class RedditFragment extends BaseGridFragment implements RedditFilterFrag
 
     private void setupAdapter(List<ImgurBaseObject> objects) {
         if (getAdapter() == null) {
-            setUpGridTop();
-            setAdapter(new GalleryAdapter(getActivity(), SetUniqueList.decorate(objects)));
+            setAdapter(new GalleryAdapter(getActivity(), mGrid, SetUniqueList.decorate(objects), this));
         } else {
             getAdapter().addItems(objects);
         }
@@ -271,7 +270,7 @@ public class RedditFragment extends BaseGridFragment implements RedditFilterFrag
                         mGrid.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (mGrid != null) mGrid.setSelection(0);
+                                if (mGrid != null) mGrid.scrollToPosition(0);
                             }
                         });
                     }

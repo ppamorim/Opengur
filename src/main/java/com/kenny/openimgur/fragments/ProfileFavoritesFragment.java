@@ -79,29 +79,24 @@ public class ProfileFavoritesFragment extends BaseGridFragment {
 
     @Override
     protected void onItemSelected(int position, ArrayList<ImgurBaseObject> items) {
-        // NOOP see onItemClick
+        // NOOP see onClick
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        int headerSize = mGrid.getNumColumns() * mGrid.getHeaderViewCount();
-        int adapterPosition = position - headerSize;
-        // Don't respond to the header being clicked
+    public void onClick(View v) {
+        int position = mGrid.getChildAdapterPosition(v);
+        ImgurBaseObject obj = getAdapter().getItem(position);
+        Intent intent;
 
-        if (adapterPosition >= 0) {
-            ImgurBaseObject obj = getAdapter().getItem(adapterPosition);
-            Intent intent;
-
-            if (obj instanceof ImgurAlbum || obj.getUpVotes() > Integer.MIN_VALUE) {
-                ArrayList<ImgurBaseObject> items = new ArrayList<>(1);
-                items.add(obj);
-                intent = ViewActivity.createIntent(getActivity(), items, 0);
-            } else {
-                intent = FullScreenPhotoActivity.createIntent(getActivity(), obj.getLink());
-            }
-
-            startActivity(intent);
+        if (obj instanceof ImgurAlbum || obj.getUpVotes() > Integer.MIN_VALUE) {
+            ArrayList<ImgurBaseObject> items = new ArrayList<>(1);
+            items.add(obj);
+            intent = ViewActivity.createIntent(getActivity(), items, 0);
+        } else {
+            intent = FullScreenPhotoActivity.createIntent(getActivity(), obj.getLink());
         }
+
+        startActivity(intent);
     }
 
     private ImgurHandler mHandler = new ImgurHandler() {
@@ -114,8 +109,7 @@ public class ProfileFavoritesFragment extends BaseGridFragment {
                     GalleryAdapter adapter = getAdapter();
 
                     if (adapter == null) {
-                        setUpGridTop();
-                        setAdapter(new GalleryAdapter(getActivity(), SetUniqueList.decorate(items)));
+                        setAdapter(new GalleryAdapter(getActivity(), mGrid, SetUniqueList.decorate(items), ProfileFavoritesFragment.this));
                     } else {
                         adapter.addItems(items);
                     }
@@ -163,19 +157,5 @@ public class ProfileFavoritesFragment extends BaseGridFragment {
 
         if (mSelectedUser == null)
             throw new IllegalArgumentException("Profile must be supplied to fragment");
-    }
-
-    @Override
-    protected int getAdditionalHeaderSpace() {
-        return getResources().getDimensionPixelSize(R.dimen.tab_bar_height);
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        if (isVisibleToUser && mGrid != null && mGrid.getFirstVisiblePosition() <= 1 && mListener != null) {
-            mListener.onUpdateActionBar(true);
-        }
     }
 }

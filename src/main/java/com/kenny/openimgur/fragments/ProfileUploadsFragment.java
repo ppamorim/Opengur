@@ -57,7 +57,8 @@ public class ProfileUploadsFragment extends BaseGridFragment implements AdapterV
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mGrid.setOnItemLongClickListener(this);
+        // TODO
+        // mGrid.setOnItemLongClickListener(this);
     }
 
     @Override
@@ -94,7 +95,8 @@ public class ProfileUploadsFragment extends BaseGridFragment implements AdapterV
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        int headerSize = mGrid.getNumColumns() * mGrid.getHeaderViewCount();
+        // TODO
+        /*int headerSize = mGrid.getNumColumns() * mGrid.getHeaderViewCount();
         int adapterPosition = position - headerSize;
 
         if (adapterPosition >= 0) {
@@ -142,7 +144,7 @@ public class ProfileUploadsFragment extends BaseGridFragment implements AdapterV
                         }
                     }).show();
             return true;
-        }
+        }*/
         return false;
     }
 
@@ -177,8 +179,7 @@ public class ProfileUploadsFragment extends BaseGridFragment implements AdapterV
                     GalleryAdapter adapter = getAdapter();
 
                     if (adapter == null) {
-                        setUpGridTop();
-                        setAdapter(new GalleryAdapter(getActivity(), SetUniqueList.decorate(items)));
+                        setAdapter(new GalleryAdapter(getActivity(), mGrid, SetUniqueList.decorate(items), ProfileUploadsFragment.this));
                     } else {
                         adapter.addItems(items);
                     }
@@ -206,7 +207,8 @@ public class ProfileUploadsFragment extends BaseGridFragment implements AdapterV
                         GalleryAdapter gAdapter = getAdapter();
 
                         if (gAdapter != null) {
-                            gAdapter.removeItem((String) msg.obj);
+                            // TODO
+                           // gAdapter.removeItem((String) msg.obj);
 
                             if (gAdapter.isEmpty()) {
                                 mMultiStateView.setViewState(MultiStateView.ViewState.ERROR);
@@ -227,18 +229,4 @@ public class ProfileUploadsFragment extends BaseGridFragment implements AdapterV
             super.handleMessage(msg);
         }
     };
-
-    @Override
-    protected int getAdditionalHeaderSpace() {
-        return getResources().getDimensionPixelSize(R.dimen.tab_bar_height);
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        if (isVisibleToUser && mGrid != null && mGrid.getFirstVisiblePosition() <= 1 && mListener != null) {
-            mListener.onUpdateActionBar(true);
-        }
-    }
 }
