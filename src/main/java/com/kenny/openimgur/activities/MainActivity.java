@@ -49,6 +49,7 @@ import butterknife.OnClick;
  */
 public class MainActivity extends BaseActivity implements FragmentListener, NavigationView.OnNavigationItemSelectedListener {
     private static final String KEY_CURRENT_PAGE = "current_page";
+
     public static final int PAGE_PROFILE = 0;
 
     public static final int PAGE_GALLERY = 1;
@@ -342,6 +343,11 @@ public class MainActivity extends BaseActivity implements FragmentListener, Navi
 
     @Override
     public void onUpdateActionBar(boolean shouldShow) {
+        if (shouldShow) {
+            mUploadMenu.showMenuButton(true);
+        } else {
+            mUploadMenu.hideMenuButton(true);
+        }
     }
 
     @Override

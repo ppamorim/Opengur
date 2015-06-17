@@ -86,6 +86,8 @@ public abstract class BaseGridFragment extends BaseFragment implements View.OnCl
 
     private int mPastVisiblesItems;
 
+    private int mScrollDistance = 0;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -129,6 +131,15 @@ public abstract class BaseGridFragment extends BaseFragment implements View.OnCl
                     mManager = (GridLayoutManager) recyclerView.getLayoutManager();
                 }
 
+                int currentScroll = mScrollDistance;
+                mScrollDistance += dy;
+                
+                if (currentScroll > mScrollDistance) {
+                    if (mListener != null) mListener.onUpdateActionBar(true);
+                } else if (currentScroll < mScrollDistance) {
+                    if (mListener != null) mListener.onUpdateActionBar(false);
+                }
+
                 mVisibleItemCount = mManager.getChildCount();
                 mTotalItemCount = mManager.getItemCount();
                 mPastVisiblesItems = mManager.findFirstVisibleItemPosition();
@@ -141,7 +152,6 @@ public abstract class BaseGridFragment extends BaseFragment implements View.OnCl
                 }
             }
         });
-        //mGrid.setOnItemClickListener(this);
         mRefreshLayout.setColorSchemeColors(getResources().getColor(theme.accentColor));
         int bgColor = theme.isDarkTheme ? R.color.background_material_dark : R.color.background_material_light;
         mRefreshLayout.setProgressBackgroundColorSchemeColor(getResources().getColor(bgColor));
