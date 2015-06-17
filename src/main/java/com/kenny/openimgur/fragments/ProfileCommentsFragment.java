@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 
 import com.kenny.openimgur.R;
 import com.kenny.openimgur.activities.ViewActivity;
-import com.kenny.openimgur.adapters.ProfileCommentAdapter2;
+import com.kenny.openimgur.adapters.ProfileCommentAdapter;
 import com.kenny.openimgur.api.ApiClient;
 import com.kenny.openimgur.api.Endpoints;
 import com.kenny.openimgur.api.ImgurBusEvent;
@@ -68,7 +68,7 @@ public class ProfileCommentsFragment extends BaseFragment implements View.OnClic
 
     private ImgurUser mSelectedUser;
 
-    private ProfileCommentAdapter2 mAdapter;
+    private ProfileCommentAdapter mAdapter;
 
     private ApiClient mClient;
 
@@ -156,7 +156,7 @@ public class ProfileCommentsFragment extends BaseFragment implements View.OnClic
             if (savedInstanceState.containsKey(KEY_ITEMS)) {
                 ArrayList<ImgurComment> comments = savedInstanceState.getParcelableArrayList(KEY_ITEMS);
                 mPage = savedInstanceState.getInt(KEY_PAGE, 0);
-                mAdapter = new ProfileCommentAdapter2(getActivity(), comments, this);
+                mAdapter = new ProfileCommentAdapter(getActivity(), comments, this);
                 mListView.setAdapter(mAdapter);
                 mListView.scrollToPosition(savedInstanceState.getInt(KEY_POSITION, 0));
                 mMultiStatView.setViewState(MultiStateView.ViewState.CONTENT);
@@ -285,7 +285,7 @@ public class ProfileCommentsFragment extends BaseFragment implements View.OnClic
                     List<ImgurComment> comments = (List<ImgurComment>) msg.obj;
 
                     if (mAdapter == null) {
-                        mAdapter = new ProfileCommentAdapter2(getActivity(), comments, ProfileCommentsFragment.this);
+                        mAdapter = new ProfileCommentAdapter(getActivity(), comments, ProfileCommentsFragment.this);
                         mListView.setAdapter(mAdapter);
                     } else {
                         mAdapter.addItems(comments);

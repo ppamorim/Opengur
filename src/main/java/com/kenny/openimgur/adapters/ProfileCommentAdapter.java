@@ -20,16 +20,23 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 import java.util.List;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 /**
- * Created by kcampagna on 12/22/14.
+ * Created by kcampagna on 6/17/15.
  */
-public class ProfileCommentAdapter extends ImgurBaseAdapter<ImgurComment> {
+public class ProfileCommentAdapter extends BaseRecyclerAdapter<ImgurComment> {
+    private int mPositiveColor;
 
-    public ProfileCommentAdapter(Context context, List<ImgurComment> comments) {
+    private int mNegativeColor;
+
+    private View.OnClickListener mOnClickListener;
+
+    public ProfileCommentAdapter(Context context, List<ImgurComment> comments, View.OnClickListener onClickListener) {
         super(context, comments, true);
+        mPositiveColor = context.getResources().getColor(R.color.notoriety_positive);
+        mNegativeColor = context.getResources().getColor(R.color.notoriety_negative);
+        mOnClickListener = onClickListener;
     }
 
     @Override
@@ -38,20 +45,20 @@ public class ProfileCommentAdapter extends ImgurBaseAdapter<ImgurComment> {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        CommentViewHolder holder;
+    public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        CommentViewHolder holder = new CommentViewHolder(mInflater.inflate(R.layout.profile_comment_item, parent, false));
+        holder.itemView.setOnClickListener(mOnClickListener);
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(BaseViewHolder holder, int position) {
+        CommentViewHolder commentHolder = (CommentViewHolder) holder;
         ImgurComment comment = getItem(position);
         String photoUrl;
 
-        if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.profile_comment_item, parent, false);
-            holder = new CommentViewHolder(convertView);
-        } else {
-            holder = (CommentViewHolder) convertView.getTag();
-        }
-
-        holder.author.setText(constructSpan(comment, convertView.getContext()));
-        holder.comment.setText(comment.getComment());
+        commentHolder.author.setText(constructSpan(comment, commentHolder.itemView.getContext()));
+        commentHolder.comment.setText(comment.getComment());
 
         if (comment.isAlbumComment() && !TextUtils.isEmpty(comment.getAlbumCoverId())) {
             photoUrl = String.format(Endpoints.ALBUM_COVER.getUrl(), comment.getAlbumCoverId() + ImgurPhoto.THUMBNAIL_SMALL);
@@ -59,8 +66,7 @@ public class ProfileCommentAdapter extends ImgurBaseAdapter<ImgurComment> {
             photoUrl = "https://imgur.com/" + comment.getImageId() + ImgurPhoto.THUMBNAIL_SMALL + ".jpeg";
         }
 
-        displayImage(holder.image, photoUrl);
-        return convertView;
+        displayImage(commentHolder.image, photoUrl);
     }
 
     /**
@@ -76,18 +82,16 @@ public class ProfileCommentAdapter extends ImgurBaseAdapter<ImgurComment> {
         StringBuilder sb = new StringBuilder(author);
         int spanLength = author.length();
 
-        sb.append(" ").append(comment.getPoints()).append(" ").append(context.getString(R.string.points))
-                .append(" : ").append(date);
+        sb.append(" ")
+                .append(comment.getPoints())
+                .append(" ")
+                .append(context.getString(R.string.points))
+                .append(" : ")
+                .append(date);
+
         Spannable span = new SpannableString(sb.toString());
-
-        int color = context.getResources().getColor(R.color.notoriety_positive);
-        if (comment.getPoints() < 0) {
-            color = context.getResources().getColor(R.color.notoriety_negative);
-        }
-
-        span.setSpan(new ForegroundColorSpan(color), spanLength, sb.length() - date.length() - 2,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
+        int color = comment.getPoints() < 0 ? mNegativeColor : mPositiveColor;
+        span.setSpan(new ForegroundColorSpan(color), spanLength, sb.length() - date.length() - 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         return span;
     }
 
@@ -105,7 +109,7 @@ public class ProfileCommentAdapter extends ImgurBaseAdapter<ImgurComment> {
                                 | DateUtils.FORMAT_ABBREV_ALL);
     }
 
-    static class CommentViewHolder {
+    static class CommentViewHolder extends BaseViewHolder {
         @InjectView(R.id.author)
         TextView author;
 
@@ -116,8 +120,7 @@ public class ProfileCommentAdapter extends ImgurBaseAdapter<ImgurComment> {
         ImageView image;
 
         public CommentViewHolder(View view) {
-            ButterKnife.inject(this, view);
-            view.setTag(this);
+            super(view);
         }
     }
 }
