@@ -12,7 +12,7 @@
 
         <CheckBoxPreference
             android:key="darkTheme"
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:summaryOn="@string/pref_dark_theme_on"
             android:summaryOff="@string/pref_dark_theme_off"
             android:title="@string/pref_dark_theme_title" />
@@ -20,6 +20,13 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/gallery">
+
+        <ListPreference
+            android:key="thumbnailQuality"
+            android:title="@string/pref_thumbnail_quality"
+            android:entries="@array/pref_gallery_thumbnails"
+            android:entryValues="@array/pref_thumbanail_keys"
+            android:defaultValue="b" />
 
         <CheckBoxPreference
             android:key="autoLoadComments"

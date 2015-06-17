@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.support.annotation.StyleRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -206,8 +207,19 @@ abstract public class BaseActivity extends AppCompatActivity {
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void setStatusBarColor(int color) {
-        if (app.sdkVersion >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(color);
+        }
+    }
+
+    /**
+     * Sets the color of the status bar, only for SDK 21+ devices
+     *
+     * @param color
+     */
+    public void setStatusBarColorResource(@ColorRes int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setStatusBarColor(getResources().getColor(color));
         }
     }
 

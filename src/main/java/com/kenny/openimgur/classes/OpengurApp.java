@@ -3,31 +3,23 @@ package com.kenny.openimgur.classes;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Environment;
 import android.os.StrictMode;
+import android.os.UserManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.text.format.DateUtils;
 
 import com.crashlytics.android.Crashlytics;
 import com.kenny.openimgur.BuildConfig;
 import com.kenny.openimgur.activities.SettingsActivity;
-import com.kenny.openimgur.api.ApiClient;
-import com.kenny.openimgur.api.Endpoints;
 import com.kenny.openimgur.util.FileUtil;
 import com.kenny.openimgur.util.ImageUtil;
 import com.kenny.openimgur.util.LogUtil;
 import com.kenny.openimgur.util.SqlHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.RequestBody;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -39,11 +31,9 @@ public class OpengurApp extends Application implements SharedPreferences.OnShare
 
     private static boolean USE_STRICT_MODE = BuildConfig.DEBUG;
 
-    private static OpengurApp instance;
+    private static OpengurApp sInstance;
 
     private ImageLoader mImageLoader;
-
-    public int sdkVersion = Build.VERSION.SDK_INT;
 
     private SharedPreferences mPref;
 
@@ -51,20 +41,19 @@ public class OpengurApp extends Application implements SharedPreferences.OnShare
 
     private ImgurUser mUser;
 
-    private boolean mIsFetchingAccessToken = false;
-
     private ImgurTheme mTheme = ImgurTheme.GREY;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        instance = this;
+        sInstance = this;
+        stopUserManagerLeak();
         mPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mPref.registerOnSharedPreferenceChangeListener(this);
         mSql = new SqlHelper(getApplicationContext());
         mUser = mSql.getUser();
         mTheme = ImgurTheme.getThemeFromString(mPref.getString(SettingsActivity.THEME_KEY, ImgurTheme.GREY.themeName));
-        mTheme.isDarkTheme = mPref.getBoolean(SettingsActivity.KEY_DARK_THEME, false);
+        mTheme.isDarkTheme = mPref.getBoolean(SettingsActivity.KEY_DARK_THEME, true);
 
         // Start crashlytics if enabled
         if (!BuildConfig.DEBUG && mPref.getBoolean(SettingsActivity.KEY_CRASHLYTICS, true)) {
@@ -107,11 +96,11 @@ public class OpengurApp extends Application implements SharedPreferences.OnShare
     }
 
     public static OpengurApp getInstance() {
-        return instance;
+        return sInstance;
     }
 
     public static OpengurApp getInstance(Context context) {
-        return context != null ? (OpengurApp) context.getApplicationContext() : instance;
+        return context != null ? (OpengurApp) context.getApplicationContext() : sInstance;
     }
 
     public SharedPreferences getPreferences() {
@@ -185,6 +174,26 @@ public class OpengurApp extends Application implements SharedPreferences.OnShare
                     .detectAll()
                     .penaltyLog()
                     .build());
+        }
+    }
+
+    /**
+     * Attempts to call static method from {@link UserManager} that is causing an activity leak
+     * https://code.google.com/p/android/issues/detail?id=173789
+     */
+    private void stopUserManagerLeak() {
+        try {
+            Method method = UserManager.class.getMethod("get", Context.class);
+            method.setAccessible(true);
+
+            if (method.isAccessible()) {
+                method.invoke(null, getApplicationContext());
+                LogUtil.v(TAG, "Able to access method causing leak");
+            } else {
+                LogUtil.w(TAG, "Unable to access method to stop leak");
+            }
+        } catch (Throwable ex) {
+            LogUtil.e(TAG, "Unable to fix user manager leak", ex);
         }
     }
 

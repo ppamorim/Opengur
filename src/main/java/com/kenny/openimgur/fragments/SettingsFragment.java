@@ -42,6 +42,7 @@ public class SettingsFragment extends BasePreferenceFragment implements Preferen
         bindListPreference(findPreference(SettingsActivity.CACHE_SIZE_KEY));
         bindListPreference(findPreference(SettingsActivity.THEME_KEY));
         bindListPreference(findPreference(SettingsActivity.KEY_CACHE_LOC));
+        bindListPreference(findPreference(SettingsActivity.KEY_THUMBNAIL_QUALITY));
         findPreference(SettingsActivity.CURRENT_CACHE_SIZE_KEY).setOnPreferenceClickListener(this);
         findPreference("licenses").setOnPreferenceClickListener(this);
         findPreference("openSource").setOnPreferenceClickListener(this);
@@ -123,7 +124,7 @@ public class SettingsFragment extends BasePreferenceFragment implements Preferen
     public boolean onPreferenceClick(final Preference preference) {
         switch (preference.getKey()) {
             case SettingsActivity.CURRENT_CACHE_SIZE_KEY:
-                new AlertDialog.Builder(getActivity(), mApp.getImgurTheme().getDialogTheme())
+                new AlertDialog.Builder(getActivity(), mApp.getImgurTheme().getAlertDialogTheme())
                         .setTitle(R.string.clear_cache)
                         .setMessage(R.string.clear_cache_message)
                         .setNegativeButton(R.string.cancel, null)
@@ -137,7 +138,7 @@ public class SettingsFragment extends BasePreferenceFragment implements Preferen
 
             case "licenses":
                 WebView webView = new WebView(getActivity());
-                new AlertDialog.Builder(getActivity(), mApp.getImgurTheme().getDialogTheme())
+                new AlertDialog.Builder(getActivity(), mApp.getImgurTheme().getAlertDialogTheme())
                         .setPositiveButton(R.string.dismiss, null)
                         .setView(webView)
                         .show();

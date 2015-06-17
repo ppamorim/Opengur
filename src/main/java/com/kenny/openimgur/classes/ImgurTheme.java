@@ -1,6 +1,8 @@
 package com.kenny.openimgur.classes;
 
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.support.annotation.ColorRes;
 import android.support.annotation.StyleRes;
 
@@ -49,7 +51,7 @@ public enum ImgurTheme {
     }
 
     @StyleRes
-    public int getDialogTheme() {
+    public int getAlertDialogTheme() {
         switch (this) {
             case BLUE:
             case ORANGE:
@@ -70,6 +72,50 @@ public enum ImgurTheme {
             default:
                 return isDarkTheme ? R.style.Theme_AppCompat_Dialog_Alert_Accent_Green : R.style.Theme_AppCompat_Light_Dialog_Alert_Accent_Green;
         }
+    }
+
+    @StyleRes
+    public int getDialogTheme() {
+        switch (this) {
+            case BLUE:
+            case ORANGE:
+            case CYAN:
+            case GREEN:
+            case TEAL:
+            case PURPLE:
+                return isDarkTheme ? R.style.Theme_AppCompat_Dialog_Accent_Pink : R.style.Theme_AppCompat_Light_Dialog_Accent_Pink;
+
+            case RED:
+            case PINK:
+                return isDarkTheme ? R.style.Theme_AppCompat_Dialog_Accent_Blue : R.style.Theme_AppCompat_Light_Dialog_Accent_Blue;
+
+            case BLACK:
+                return isDarkTheme ? R.style.Theme_AppCompat_Dialog_Accent_Yellow : R.style.Theme_AppCompat_Light_Dialog_Accent_Yellow;
+
+            case GREY:
+            default:
+                return isDarkTheme ? R.style.Theme_AppCompat_Dialog_Accent_Green : R.style.Theme_AppCompat_Light_Dialog_Accent_Green;
+        }
+    }
+
+    /**
+     * Returns the {@link ColorStateList} for the NavigationView
+     *
+     * @param res
+     * @return
+     */
+    public ColorStateList getNavigationColors(Resources res) {
+        int[][] states = new int[][]{
+                new int[]{android.R.attr.state_checked},
+                new int[]{-android.R.attr.state_checked}
+        };
+
+        int[] colors = new int[]{
+                res.getColor(accentColor),
+                isDarkTheme ? Color.WHITE : Color.BLACK
+        };
+
+        return new ColorStateList(states, colors);
     }
 
     /**

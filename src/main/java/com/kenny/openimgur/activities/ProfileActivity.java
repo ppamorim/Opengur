@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -24,9 +25,7 @@ import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.LinearLayout;
 
-import com.astuetz.PagerSlidingTabStrip;
 import com.kenny.openimgur.R;
 import com.kenny.openimgur.api.ApiClient;
 import com.kenny.openimgur.api.Endpoints;
@@ -42,7 +41,6 @@ import com.kenny.openimgur.fragments.ProfileSubmissionsFragment;
 import com.kenny.openimgur.fragments.ProfileUploadsFragment;
 import com.kenny.openimgur.ui.MultiStateView;
 import com.kenny.openimgur.util.LogUtil;
-import com.kenny.openimgur.util.ViewUtils;
 
 import org.json.JSONException;
 
@@ -69,7 +67,7 @@ public class ProfileActivity extends BaseActivity implements FragmentListener {
     private static final String KEY_USER = "user";
 
     @InjectView(R.id.slidingTabs)
-    PagerSlidingTabStrip mSlidingTabs;
+    TabLayout mSlidingTabs;
 
     @InjectView(R.id.pager)
     ViewPager mPager;
@@ -99,7 +97,7 @@ public class ProfileActivity extends BaseActivity implements FragmentListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        setStatusBarColor(getResources().getColor(theme.darkColor));
+        setStatusBarColorResource(theme.darkColor);
         setupToolBar();
         handleData(savedInstanceState, getIntent());
     }
@@ -160,7 +158,7 @@ public class ProfileActivity extends BaseActivity implements FragmentListener {
             LogUtil.v(TAG, "Selected user present in database and has valid data");
             mAdapter = new ProfilePager(getApplicationContext(), getFragmentManager(), mSelectedUser);
             mPager.setAdapter(mAdapter);
-            mSlidingTabs.setViewPager(mPager);
+            mSlidingTabs.setupWithViewPager(mPager);
             mMultiView.setViewState(MultiStateView.ViewState.CONTENT);
             getSupportActionBar().setTitle(mSelectedUser.getUsername());
             supportInvalidateOptionsMenu();
@@ -190,7 +188,7 @@ public class ProfileActivity extends BaseActivity implements FragmentListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.logout:
-                new AlertDialog.Builder(ProfileActivity.this, theme.getDialogTheme())
+                new AlertDialog.Builder(ProfileActivity.this, theme.getAlertDialogTheme())
                         .setTitle(R.string.logout)
                         .setMessage(R.string.logout_confirm)
                         .setNegativeButton(R.string.cancel, null)
@@ -357,7 +355,7 @@ public class ProfileActivity extends BaseActivity implements FragmentListener {
                 case MESSAGE_ACTION_COMPLETE:
                     mAdapter = new ProfilePager(getApplicationContext(), getFragmentManager(), mSelectedUser);
                     mPager.setAdapter(mAdapter);
-                    mSlidingTabs.setViewPager(mPager);
+                    mSlidingTabs.setupWithViewPager(mPager);
                     mMultiView.setViewState(MultiStateView.ViewState.CONTENT);
                     supportInvalidateOptionsMenu();
                     break;
