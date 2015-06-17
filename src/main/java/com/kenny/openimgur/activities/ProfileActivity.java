@@ -21,7 +21,6 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -77,9 +76,6 @@ public class ProfileActivity extends BaseActivity implements FragmentListener {
 
     @InjectView(R.id.toolBar)
     Toolbar mToolBar;
-
-    @InjectView(R.id.toolBarContainer)
-    View mToolbarContainer;
 
     private ImgurUser mSelectedUser;
 
@@ -375,13 +371,13 @@ public class ProfileActivity extends BaseActivity implements FragmentListener {
 
     @Override
     public void onUpdateActionBar(boolean shouldShow) {
-        boolean isVisibile = mToolbarContainer.getTranslationY() == 0;
+       /* boolean isVisibile = mToolbarContainer.getTranslationY() == 0;
 
         if (isVisibile != shouldShow && !mIsAnimating) {
             //Actionbar visibility has changed
             mIsAnimating = true;
             mToolbarContainer.animate().translationY(shouldShow ? 0 : -mToolBar.getHeight()).setListener(mAnimAdapter);
-        }
+        }*/
     }
 
     private AnimatorListenerAdapter mAnimAdapter = new AnimatorListenerAdapter() {
