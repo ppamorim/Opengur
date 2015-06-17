@@ -22,7 +22,7 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<BaseRe
 
     private List<T> mItems;
 
-    private ImageLoader mImageLoader;
+    protected ImageLoader mImageLoader;
 
     protected LayoutInflater mInflater;
 

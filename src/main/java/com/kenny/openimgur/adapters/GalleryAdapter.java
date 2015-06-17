@@ -1,6 +1,7 @@
 package com.kenny.openimgur.adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +18,7 @@ import com.kenny.openimgur.classes.ImgurPhoto;
 import com.kenny.openimgur.classes.OpengurApp;
 import com.kenny.openimgur.util.FileUtil;
 import com.kenny.openimgur.util.ImageUtil;
+import com.kenny.openimgur.util.LogUtil;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 import org.apache.commons.collections15.list.SetUniqueList;
@@ -40,13 +42,17 @@ public class GalleryAdapter extends BaseRecyclerAdapter<ImgurBaseObject> {
 
     private View.OnClickListener mClickListener;
 
+    private String mThumbnailQuality;
+
     public GalleryAdapter(Context context, RecyclerView view, SetUniqueList<ImgurBaseObject> objects, View.OnClickListener listener) {
         super(context, objects, true);
         int gridSize = context.getResources().getInteger(R.integer.gallery_num_columns);
         view.setLayoutManager(new GridLayoutManager(context, gridSize));
         mUpvoteColor = context.getResources().getColor(R.color.notoriety_positive);
         mDownVoteColor = context.getResources().getColor(R.color.notoriety_negative);
-        mAllowNSFWThumb = OpengurApp.getInstance(context).getPreferences().getBoolean(SettingsActivity.KEY_NSFW_THUMBNAILS, false);
+        SharedPreferences pref = OpengurApp.getInstance(context).getPreferences();
+        mAllowNSFWThumb = pref.getBoolean(SettingsActivity.KEY_NSFW_THUMBNAILS, false);
+        mThumbnailQuality = pref.getString(SettingsActivity.KEY_THUMBNAIL_QUALITY, ImgurPhoto.THUMBNAIL_GALLERY);
         mClickListener = listener;
     }
 
@@ -129,6 +135,16 @@ public class GalleryAdapter extends BaseRecyclerAdapter<ImgurBaseObject> {
     public void setAllowNSFW(boolean allowNSFW) {
         mAllowNSFWThumb = allowNSFW;
         notifyDataSetChanged();
+    }
+
+    public void setThumbnailQuality(String quality) {
+        if (!mThumbnailQuality.equals(quality)) {
+            LogUtil.v(TAG, "Updating thumbnail quality to " + quality);
+            // Clear any memory cache we may have for the new thumbnail
+            mImageLoader.clearMemoryCache();
+            mThumbnailQuality = quality;
+            notifyDataSetChanged();
+        }
     }
 
     public static class GalleryHolder extends BaseViewHolder {
