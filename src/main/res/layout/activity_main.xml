@@ -24,6 +24,13 @@
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:popupTheme="?toolBarPopupTheme" />
 
+            <!-- Needed for AppBarLayout to work correctly -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/transparent"
+                android:visibility="invisible"/>
+
         </android.support.design.widget.AppBarLayout>
 
         <FrameLayout
