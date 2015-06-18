@@ -2,7 +2,6 @@ package com.kenny.openimgur.fragments;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,9 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
@@ -31,7 +28,6 @@ import com.kenny.openimgur.classes.ImgurListener;
 import com.kenny.openimgur.classes.ImgurUser;
 import com.kenny.openimgur.ui.VideoView;
 import com.kenny.openimgur.util.LinkUtils;
-import com.kenny.openimgur.util.ViewUtils;
 import com.kenny.snackbar.SnackBar;
 
 import java.text.SimpleDateFormat;
@@ -45,9 +41,6 @@ import butterknife.InjectView;
 public class ProfileInfoFragment extends BaseFragment implements ImgurListener {
     private static final String KEY_USER = "user";
 
-    @InjectView(R.id.username)
-    TextView mUserName;
-
     @InjectView(R.id.notoriety)
     TextView mNotoriety;
 
@@ -59,12 +52,6 @@ public class ProfileInfoFragment extends BaseFragment implements ImgurListener {
 
     @InjectView(R.id.date)
     TextView mDate;
-
-    @InjectView(R.id.container)
-    ScrollView mContainer;
-
-    @InjectView(R.id.infoContainer)
-    LinearLayout mInfoContainer;
 
     private ImgurUser mSelectedUser;
 
@@ -97,14 +84,6 @@ public class ProfileInfoFragment extends BaseFragment implements ImgurListener {
             throw new IllegalArgumentException("Bundle can not be null and must contain a user");
         }
 
-        int tabHeight = getResources().getDimensionPixelSize(R.dimen.tab_bar_height);
-        int translucentHeight = ViewUtils.getHeightForTranslucentStyle(getActivity());
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mInfoContainer.addView(ViewUtils.getFooterViewForComments(getActivity()));
-        }
-
-        mContainer.setPadding(0, tabHeight + translucentHeight, 0, 0);
         mSelectedUser = bundle.getParcelable(KEY_USER);
         setupInfo();
     }
@@ -153,12 +132,10 @@ public class ProfileInfoFragment extends BaseFragment implements ImgurListener {
      * Sets up the view to display the user's info
      */
     private void setupInfo() {
-        mUserName.setBackgroundColor(getResources().getColor(theme.primaryColor));
         String date = new SimpleDateFormat("MMM yyyy").format(new Date(mSelectedUser.getCreated()));
         mNotoriety.setText(mSelectedUser.getNotoriety().getStringId());
         mNotoriety.setTextColor(getResources().getColor(mSelectedUser.getNotoriety().getNotorietyColor()));
         mRep.setText(getString(R.string.profile_rep, mSelectedUser.getReputation()));
-        mUserName.setText(mSelectedUser.getUsername());
         mDate.setText(getString(R.string.profile_date, date));
 
         if (!TextUtils.isEmpty(mSelectedUser.getBio())) {
