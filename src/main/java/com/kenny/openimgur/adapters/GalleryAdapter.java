@@ -2,7 +2,9 @@ package com.kenny.openimgur.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -46,10 +48,12 @@ public class GalleryAdapter extends BaseRecyclerAdapter<ImgurBaseObject> {
 
     public GalleryAdapter(Context context, RecyclerView view, SetUniqueList<ImgurBaseObject> objects, View.OnClickListener listener) {
         super(context, objects, true);
-        int gridSize = context.getResources().getInteger(R.integer.gallery_num_columns);
+        Resources res = context.getResources();
+        int gridSize = res.getInteger(R.integer.gallery_num_columns);
         view.setLayoutManager(new GridLayoutManager(context, gridSize));
-        mUpvoteColor = context.getResources().getColor(R.color.notoriety_positive);
-        mDownVoteColor = context.getResources().getColor(R.color.notoriety_negative);
+        view.addItemDecoration(new GridItemDecoration(res.getDimensionPixelSize(R.dimen.grid_padding), gridSize));
+        mUpvoteColor = res.getColor(R.color.notoriety_positive);
+        mDownVoteColor = res.getColor(R.color.notoriety_negative);
         SharedPreferences pref = OpengurApp.getInstance(context).getPreferences();
         mAllowNSFWThumb = pref.getBoolean(SettingsActivity.KEY_NSFW_THUMBNAILS, false);
         mThumbnailQuality = pref.getString(SettingsActivity.KEY_THUMBNAIL_QUALITY, ImgurPhoto.THUMBNAIL_GALLERY);
@@ -156,6 +160,52 @@ public class GalleryAdapter extends BaseRecyclerAdapter<ImgurBaseObject> {
 
         public GalleryHolder(View view) {
             super(view);
+        }
+    }
+
+    private static class GridItemDecoration extends RecyclerView.ItemDecoration {
+        private int mSpace;
+
+        private int mNumColumns;
+
+        public GridItemDecoration(int spacing, int numColumns) {
+            mSpace = spacing;
+            mNumColumns = numColumns;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            int position = parent.getLayoutManager().getPosition(view);
+            int mod = position % mNumColumns;
+
+            switch (mNumColumns) {
+                case 3:
+                    if (mod == 1) {
+                        outRect.left = mSpace;
+                        outRect.right = mSpace;
+                    }
+                    break;
+
+                case 4:
+                    if (mod == 1) {
+                        outRect.left = mSpace;
+                    } else if (mod == 2) {
+                        outRect.left = mSpace;
+                        outRect.right = mSpace;
+                    }
+                    break;
+
+                case 5:
+                    if (mod == 1 || mod == 2) {
+                        outRect.left = mSpace;
+                    } else if (mod == 3) {
+                        outRect.left = mSpace;
+                        outRect.right = mSpace;
+                    }
+                    break;
+            }
+
+            outRect.top = mSpace;
         }
     }
 }

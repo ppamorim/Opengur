@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingRight="@dimen/content_padding"
+    android:foreground="?selectableItemBackgroundBorderless"
     android:minHeight="?android:listPreferredItemHeight"
     android:descendantFocusability="blocksDescendants">
 
@@ -41,5 +42,13 @@
             tools:text="This will be a comment " />
 
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?dividerColor"
+        android:layout_marginLeft="@dimen/keyline_margin"
+        android:layout_gravity="bottom"
+        tools:background="@color/primary_material_light" />
 
 </FrameLayout>
