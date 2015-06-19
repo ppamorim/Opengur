@@ -47,7 +47,7 @@ public class ConvoAdapter extends BaseRecyclerAdapter<ImgurConvo> {
         ConvoViewHolder convoHolder = (ConvoViewHolder) holder;
 
         String firstLetter = convo.getWithAccount().substring(0, 1);
-        int color = ColorGenerator.DEFAULT.getColor(convo.getWithAccount());
+        int color = ColorGenerator.MATERIAL.getColor(convo.getWithAccount());
 
         convoHolder.image.setImageDrawable(
                 TextDrawable.builder()

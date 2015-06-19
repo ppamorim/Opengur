@@ -8,12 +8,12 @@ import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AbsListView;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import com.kenny.openimgur.R;
 import com.kenny.openimgur.adapters.MessagesAdapter;
@@ -43,16 +43,18 @@ import de.greenrobot.event.util.ThrowableFailureEvent;
 /**
  * Created by kcampagna on 12/25/14.
  */
-public class ConvoThreadActivity extends BaseActivity implements AbsListView.OnScrollListener {
+public class ConvoThreadActivity extends BaseActivity {
     public static final int REQUEST_CODE = 102;
+
     public static final String KEY_BLOCKED_CONVO = "blocked_convo";
+
     private static final String KEY_CONVO = "convo";
 
     @InjectView(R.id.multiView)
     MultiStateView mMultiView;
 
     @InjectView(R.id.convoList)
-    ListView mListView;
+    RecyclerView mListView;
 
     @InjectView(R.id.messageInput)
     EditText mMessageInput;
@@ -79,7 +81,20 @@ public class ConvoThreadActivity extends BaseActivity implements AbsListView.OnS
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_convo_thread);
-        mListView.setOnScrollListener(this);
+
+        mListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int totalItemCount = recyclerView.getAdapter().getItemCount();
+                int firstVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+
+                if (mHasMore && !mIsLoading && totalItemCount > 0 && firstVisibleItem == 0 && mHasScrolledInitially) {
+                    mCurrentPage++;
+                    fetchMessages();
+                }
+            }
+        });
+
         handleData(savedInstanceState);
     }
 
@@ -150,9 +165,9 @@ public class ConvoThreadActivity extends BaseActivity implements AbsListView.OnS
         }
 
         if (mConvo.getMessages() != null && !mConvo.getMessages().isEmpty()) {
-            mAdapter = new MessagesAdapter(getApplicationContext(), mConvo.getMessages());
+            mAdapter = new MessagesAdapter(mListView, getApplicationContext(), mConvo.getMessages());
             mListView.setAdapter(mAdapter);
-            mListView.setSelection(mAdapter.getCount() - 1);
+            mListView.scrollToPosition(mAdapter.getItemCount() - 1);
             mHasScrolledInitially = true;
         }
 
@@ -183,14 +198,14 @@ public class ConvoThreadActivity extends BaseActivity implements AbsListView.OnS
                 if (mAdapter == null) {
                     List<ImgurMessage> messages = new ArrayList<>();
                     messages.add(newMessage);
-                    mAdapter = new MessagesAdapter(getApplicationContext(), messages);
+                    mAdapter = new MessagesAdapter(mListView, getApplicationContext(), messages);
                     mListView.setAdapter(mAdapter);
                 } else {
                     mAdapter.addItem(newMessage);
                 }
 
                 mMultiView.setViewState(MultiStateView.ViewState.CONTENT);
-                mListView.setSelection(mAdapter.getCount() - 1);
+                mListView.scrollToPosition(mAdapter.getItemCount() - 1);
                 mApiClient.doWork(ImgurBusEvent.EventType.MESSAGE_SEND, newMessage.getId(), builder.build());
                 mMessageInput.setText(null);
             } else {
@@ -240,22 +255,6 @@ public class ConvoThreadActivity extends BaseActivity implements AbsListView.OnS
     protected void onPause() {
         EventBus.getDefault().unregister(this);
         super.onPause();
-    }
-
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-        // NOOP
-    }
-
-    @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        // We want to check for when they are at the TOP of the list this time as the messages come in reverse order
-        // from the api (newest to oldest)
-
-        if (mHasMore && !mIsLoading && totalItemCount > 0 && firstVisibleItem == 0 && mHasScrolledInitially) {
-            mCurrentPage++;
-            fetchMessages();
-        }
     }
 
     public void onEventAsync(@NonNull ImgurBusEvent event) {
@@ -328,7 +327,7 @@ public class ConvoThreadActivity extends BaseActivity implements AbsListView.OnS
                     boolean scrollToBottom = false;
 
                     if (mAdapter == null) {
-                        mAdapter = new MessagesAdapter(getApplicationContext(), messages);
+                        mAdapter = new MessagesAdapter(mListView, getApplicationContext(), messages);
                         mListView.setAdapter(mAdapter);
                         // Start at the bottom of the list when we receive the first set of messages
                         scrollToBottom = true;
@@ -348,7 +347,7 @@ public class ConvoThreadActivity extends BaseActivity implements AbsListView.OnS
                         mMultiView.post(new Runnable() {
                             @Override
                             public void run() {
-                                mListView.setSelection(mAdapter.getCount() - 1);
+                                mListView.scrollToPosition(mAdapter.getItemCount() - 1);
                                 mHasScrolledInitially = true;
                             }
                         });

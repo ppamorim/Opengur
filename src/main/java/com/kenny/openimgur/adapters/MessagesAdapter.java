@@ -1,7 +1,11 @@
 package com.kenny.openimgur.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Rect;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -20,43 +24,49 @@ import java.util.List;
 import butterknife.InjectView;
 
 /**
- * Created by kcampagna on 12/25/14.
+ * Created by kcampagna on 6/18/15.
  */
-public class MessagesAdapter extends ImgurBaseAdapter<ImgurMessage> {
-    private int mMargin;
-
+public class MessagesAdapter extends BaseRecyclerAdapter<ImgurMessage> {
     private int mUserId;
 
-    public MessagesAdapter(Context context, List<ImgurMessage> messages) {
+    private int mUserColor;
+
+    public MessagesAdapter(RecyclerView view, Context context, List<ImgurMessage> messages) {
         super(context, messages);
-        mUserId = OpengurApp.getInstance(context).getUser().getId();
-        mMargin = (int) (context.getResources().getDisplayMetrics().widthPixels * .25);
+        OpengurApp app = OpengurApp.getInstance(context);
+        Resources res = context.getResources();
+        mUserColor = res.getColor(app.getImgurTheme().accentColor);
+        mUserId = app.getUser().getId();
+        int messageMargin = (int) (res.getDisplayMetrics().widthPixels * .25);
+        int messageSpacing = res.getDimensionPixelSize(R.dimen.message_spacing);
+        view.setLayoutManager(new LinearLayoutManager(context));
+        view.addItemDecoration(new MessageItemDecoration(mUserId, messageMargin, messageSpacing));
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        MessagesViewHolder holder;
+    public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new MessagesViewHolder(mInflater.inflate(R.layout.convo_message, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(BaseViewHolder holder, int position) {
+        MessagesViewHolder messageHolder = (MessagesViewHolder) holder;
         ImgurMessage message = getItem(position);
 
-        if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.convo_message, parent, false);
-            holder = new MessagesViewHolder(convertView);
-        } else {
-            holder = (MessagesViewHolder) convertView.getTag();
-        }
-
-        holder.configView(message, mMargin, mUserId);
-        holder.message.setText(message.getBody());
+        messageHolder.message.setText(message.getBody());
 
         if (message.isSending()) {
-            holder.timeStamp.setText(R.string.convo_message_sending);
+            messageHolder.timeStamp.setText(R.string.convo_message_sending);
         } else if (message.getDate() > 0) {
-            holder.timeStamp.setText(getDateFormattedTime(message.getDate() * 1000, convertView.getContext()));
+            messageHolder.timeStamp.setText(getDateFormattedTime(message.getDate() * DateUtils.SECOND_IN_MILLIS, messageHolder.itemView.getContext()));
         } else {
-            holder.timeStamp.setText(R.string.convo_message_failed);
+            messageHolder.timeStamp.setText(R.string.convo_message_failed);
         }
 
-        return convertView;
+        boolean isFromUser = message.getSenderId() == mUserId;
+        int bgColor = isFromUser ? mUserColor : ColorGenerator.MATERIAL.getColor(message.getFrom());
+        messageHolder.container.setGravity(isFromUser ? Gravity.RIGHT : Gravity.LEFT);
+        messageHolder.itemView.setBackgroundColor(bgColor);
     }
 
     private CharSequence getDateFormattedTime(long commentDate, Context context) {
@@ -81,7 +91,7 @@ public class MessagesAdapter extends ImgurBaseAdapter<ImgurMessage> {
      */
     public void onMessageSendComplete(boolean successful, String id) {
         // The message will most likely be the last item in the list, or near the end
-        for (int i = getCount() - 1; i >= 0; i--) {
+        for (int i = getItemCount() - 1; i >= 0; i--) {
             ImgurMessage message = getItem(i);
 
             if (message.getId().equals(id)) {
@@ -93,7 +103,7 @@ public class MessagesAdapter extends ImgurBaseAdapter<ImgurMessage> {
         }
     }
 
-    static class MessagesViewHolder extends ImgurViewHolder {
+    static class MessagesViewHolder extends BaseViewHolder {
         @InjectView(R.id.messageContainer)
         LinearLayout container;
 
@@ -120,7 +130,7 @@ public class MessagesAdapter extends ImgurBaseAdapter<ImgurMessage> {
                 message.setTextColor(Color.BLACK);
                 timeStamp.setTextColor(Color.BLACK);
             } else {
-                container.setBackgroundColor(ColorGenerator.DEFAULT.getColor(imgurMessage.getFrom()));
+                container.setBackgroundColor(ColorGenerator.MATERIAL.getColor(imgurMessage.getFrom()));
                 lp.setMargins(0, 0, margin, 0);
                 lp.gravity = Gravity.LEFT;
                 container.setGravity(Gravity.LEFT);
@@ -129,5 +139,34 @@ public class MessagesAdapter extends ImgurBaseAdapter<ImgurMessage> {
                 timeStamp.setTextColor(Color.WHITE);
             }
         }
+    }
+
+    static class MessageItemDecoration extends RecyclerView.ItemDecoration {
+
+        private int mUserId;
+
+        private int mMargin;
+
+        private int mSpacing;
+
+        public MessageItemDecoration(int id, int margin, int spacing) {
+            mUserId = id;
+            mMargin = margin;
+            mSpacing = spacing;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            int position = parent.getLayoutManager().getPosition(view);
+            MessagesAdapter adapter = (MessagesAdapter) parent.getAdapter();
+            ImgurMessage message = adapter.getItem(position);
+
+            if (mUserId == message.getSenderId()) {
+                outRect.set(mMargin, mSpacing, 0, mSpacing);
+            } else {
+                outRect.set(0, mSpacing, mMargin, mSpacing);
+            }
+        }
+
     }
 }

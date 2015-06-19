@@ -29,4 +29,7 @@
     <dimen name="comment_padding">8dp</dimen>
     <dimen name="comment_indicator_size">4dp</dimen>
 
+    <!-- Messages -->
+    <dimen name="message_spacing">8dp</dimen>
+
 </resources>
