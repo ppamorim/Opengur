@@ -1,20 +1,18 @@
 <resources>
 
-    <style name="Theme_Translucent_Light" parent="Theme_Not_Translucent_Light" />
-
     <style name="Settings_Theme_Light" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowActionBarOverlay">false</item>
     </style>
 
-    <style name="Theme_Not_Translucent_Light" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="windowActionBarOverlay">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
-
-    <style name="Theme_Translucent_Main_Light" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme_Main_Light" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="windowActionBarOverlay">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+    </style>
+
+    <style name="Theme_View_Light" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowActionBarOverlay">true</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <!-- Override styles (Light) -->
@@ -101,18 +99,16 @@
     </style>
 
     <!-- Override styles (Dark) -->
-    <style name="Theme_Translucent_Dark" parent="Theme_Not_Translucent_Light" />
-
     <style name="Settings_Theme_Dark" parent="Theme.AppCompat">
         <item name="windowActionBarOverlay">false</item>
     </style>
 
-    <style name="Theme_Not_Translucent_Dark" parent="Theme.AppCompat">
+    <style name="Theme_View_Dark" parent="Theme.AppCompat">
         <item name="windowActionBarOverlay">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="Theme_Translucent_Main_Dark" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme_Main_Dark" parent="Theme.AppCompat.NoActionBar">
         <item name="windowActionBarOverlay">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>

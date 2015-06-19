@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,11 +40,7 @@ abstract public class BaseActivity extends AppCompatActivity {
 
     private boolean mIsActionBarShowing = true;
 
-    private boolean mIsLandscape = false;
-
     private boolean mShouldShowHome = true;
-
-    private boolean mIsTablet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,9 +61,7 @@ abstract public class BaseActivity extends AppCompatActivity {
             LogUtil.w(TAG, "Action bar is null. Unable to set defaults");
         }
 
-        mIsLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         user = app.getUser();
-        mIsTablet = getResources().getBoolean(R.bool.is_tablet);
     }
 
     @Override
@@ -148,15 +141,6 @@ abstract public class BaseActivity extends AppCompatActivity {
         return mIsActionBarShowing;
     }
 
-    /**
-     * Returns if the current activity is in landscape orientation
-     *
-     * @return
-     */
-    public boolean isLandscape() {
-        return mIsLandscape;
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -189,15 +173,6 @@ abstract public class BaseActivity extends AppCompatActivity {
         if (fragment != null && fragment instanceof DialogFragment) {
             ((DialogFragment) fragment).dismiss();
         }
-    }
-
-    /**
-     * Returns if the current device is a tablet (600dp+ width)
-     *
-     * @return
-     */
-    public boolean isTablet() {
-        return mIsTablet;
     }
 
     /**

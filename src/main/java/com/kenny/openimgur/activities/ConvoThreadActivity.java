@@ -418,6 +418,6 @@ public class ConvoThreadActivity extends BaseActivity {
 
     @Override
     protected int getStyleRes() {
-        return theme.isDarkTheme ? R.style.Theme_Not_Translucent_Dark : R.style.Theme_Not_Translucent_Light;
+        return theme.isDarkTheme ? R.style.Theme_AppCompat : R.style.Theme_AppCompat_Light_DarkActionBar;
     }
 }

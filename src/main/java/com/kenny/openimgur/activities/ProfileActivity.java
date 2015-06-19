@@ -411,7 +411,7 @@ public class ProfileActivity extends BaseActivity implements FragmentListener {
 
     @Override
     protected int getStyleRes() {
-        return theme.isDarkTheme ? R.style.Theme_Translucent_Main_Dark : R.style.Theme_Translucent_Main_Light;
+        return theme.isDarkTheme ? R.style.Theme_Main_Dark : R.style.Theme_Main_Light;
     }
 
     private static class ProfilePager extends FragmentStatePagerAdapter {

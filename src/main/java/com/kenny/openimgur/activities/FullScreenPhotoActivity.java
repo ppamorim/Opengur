@@ -125,7 +125,7 @@ public class FullScreenPhotoActivity extends BaseActivity {
 
     @Override
     protected int getStyleRes() {
-        return theme.isDarkTheme ? R.style.Theme_Not_Translucent_Dark : R.style.Theme_Not_Translucent_Light;
+        return theme.isDarkTheme ? R.style.Theme_View_Dark : R.style.Theme_View_Light;
     }
 
     private static class FullScreenPagerAdapter extends FragmentStatePagerAdapter {
