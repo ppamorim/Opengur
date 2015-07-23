@@ -1,16 +1,40 @@
-/build
-.idea
-.gradle
-.DS_Store
-bin/
-gen/
-gradle.properties
-openimgur.keystore
-/libraries/EventBus/build
-/app
-crashlytics.properties
-/src/main/assets/crashlytics-build.properties
-/src/main/res/values/com_crashlytics_export_strings.xml
+# Custom
+_site
+
+# Ant
+MANIFEST.MF
+./*.jar
+build.num
+build
+
+# ADT
+.classpath
+.project
+.settings
 local.properties
+bin
+gen
+_layouts
+proguard.cfg
+
+# OSX
+.DS_Store
+
+# Github
+gh-pages
+
+# Gradle
+.gradle
+build
+
+# IDEA
 *.iml
-Thumbs.db
+*.ipr
+*.iws
+out
+.idea
+
+# Maven
+target
+release.properties
+pom.xml.*
